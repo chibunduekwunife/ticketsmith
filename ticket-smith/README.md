@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# TicketForge: Tight MVP you can actually ship
 
-First, run the development server:
+## Project Description
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+TicketForge is a web app for support ticket triage and response. Users can upload tickets (CSV or form), run an async triage pipeline, retrieve relevant KB articles, generate suggested replies with citations, and run QA checks before sending. The app demonstrates a real-world, event-driven workflow with audit trails and analytics.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup Steps
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the repo:**
+	 ```bash
+	 git clone <your-repo-url>
+	 cd ticketsmith/ticket-smith
+	 ```
+2. **Install dependencies:**
+	 ```bash
+	 npm install
+	 # or
+	 yarn install
+	 ```
+3. **Set up the database:**
+	 - Make sure you have [Docker](https://www.docker.com/) installed.
+	 - Start PostgreSQL with Docker Compose:
+		 ```bash
+		 docker-compose up -d
+		 ```
+	 - Run Prisma migrations:
+		 ```bash
+		 npx prisma migrate dev --name init
+		 ```
+4. **Configure environment variables:**
+	 - Copy `.env.example` to `.env` and fill in any required values (like `DATABASE_URL`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to Run DB + App
 
-## Learn More
+1. **Start the database:**
+	 ```bash
+	 docker-compose up -d
+	 ```
+2. **Run the app:**
+	 ```bash
+	 npm run dev
+	 # or
+	 yarn dev
+	 ```
+3. **Visit:** [http://localhost:3000](http://localhost:3000)
 
-To learn more about Next.js, take a look at the following resources:
+## What the Project Demonstrates
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Event-driven ticket triage pipeline (async processing, retries, idempotency)
+- Retrieval-Augmented Generation (RAG) with citation-only responses
+- Automated QA guardrails for reply quality
+- Evaluation harness with labelled tickets and metrics
+- Structured logs/metrics and DLQ alerts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Core Features (MVP)
 
-## Deploy on Vercel
+1. Ticket ingest (CSV upload or simple form)
+2. Auto-triage: category, priority, SLA risk
+3. Searchable KB: add 10–30 help articles, retrieve top 3 relevant snippets
+4. Suggested response with citations (only from KB)
+5. Reply QA: checklist (steps, policy, links, tone)
+6. Audit trail: store model suggestions and user edits
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## What *not* to do in MVP
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Zendesk/Intercom integration
+- Multi-tenant RBAC
+- Sentiment analysis, duplicate detection, forecasting (all at once)
+- Real-time dashboards/websockets
+
+## Milestones
+
+**Milestone 1:** Basic app + database (Day 1–3)
+	- Tickets table + KB articles table
+	- Create/list tickets
+	- Upload CSV tickets
+
+**Milestone 2:** Async pipeline (Day 4–6)
+	- Enqueue job on ticket creation
+	- Worker processes ticket, stores triage fields
+
+**Milestone 3:** Retrieval + citations (Week 2)
+	- Embedding + vector search for KB
+	- Return top snippets, force citations
+
+**Milestone 4:** QA guardrails (Week 2–3)
+	- Response QA checks (rule-based + LLM judge)
+	- Block/flag failed replies
+
+**Milestone 5:** “Resume polish” features (Week 3–4)
+	- Analytics page (categories, SLA risk, time-to-first-response)
+	- Evaluation set and metrics
+
+## Resume-Ready Bullets
+
+- Built an event-driven ticket triage pipeline with async processing, retries, and idempotency.
+- Implemented RAG with citation-only responses to reduce hallucinations and improve answer traceability.
+- Added automated QA guardrails (policy checks + missing-step detection) to flag unsafe/low-quality replies.
+- Created an evaluation harness with labelled tickets to measure triage accuracy and retrieval quality over time.
+- Instrumented the system with structured logs/metrics and DLQ alerts for pipeline failures.
+
+---
+
+## Smaller Alternatives (Backup Projects)
+
+**ClauseCraft:** Upload PDF → extract 6 fields → store → searchable list → renewal reminders. Skip risk scoring, redlines, and heavy workflows.
+
+**FinOpsGuard:** Ingest a sample CUR-like CSV → detect anomalies → generate explanation + alert. Skip PR bot + org-wide IAM complexity.
