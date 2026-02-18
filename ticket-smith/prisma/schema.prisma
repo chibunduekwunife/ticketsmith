@@ -18,3 +18,45 @@ model User {
   email String  @unique
   name  String?
 }
+
+// Stores each support ticket
+model Ticket {
+  id          Int             @id @default(autoincrement())
+  subject     String
+  body        String
+  createdAt   DateTime        @default(now())
+  // You can add a userId field if you want to link to User
+  ticketRuns  TicketRun[]
+  sentMessages SentMessage[]
+}
+
+// Stores knowledge base articles
+model KBArticle {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  url       String?
+  // You can add more fields as needed
+  ticketRuns TicketRun[] @relation("CitedArticles")
+}
+
+// Stores each triage/processing run for a ticket
+model TicketRun {
+  id         Int        @id @default(autoincrement())
+  ticket     Ticket     @relation(fields: [ticketId], references: [id])
+  ticketId   Int
+  // Citations: which KB articles were used
+  citedArticles KBArticle[] @relation("CitedArticles")
+  createdAt  DateTime   @default(now())
+  // Add more fields for pipeline status, QA results, etc.
+}
+
+// Stores each message sent as a reply to a ticket
+model SentMessage {
+  id        Int      @id @default(autoincrement())
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId  Int
+  body      String
+  sentAt    DateTime @default(now())
+  // Add more fields for status, QA, etc.
+}
